@@ -1,0 +1,32 @@
+{
+  "name": "nafedfairprice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "Satyajit Barik",
+  "license": "ISC",
+  "dependencies": {
+    "argon2": "^0.28.7",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.1",
+    "express-rate-limit": "^6.5.1",
+    "express-validator": "^6.14.2",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.14",
+    "nodemailer": "^6.7.7",
+    "nodemon": "^3.0.3",
+    "path": "^0.12.7",
+    "pdf-lib": "^1.17.1",
+    "pdfkit": "^0.14.0",
+    "qrcode": "^1.5.3",
+    "uuid": "^8.3.2"
+  }
+}
