@@ -34,6 +34,8 @@ app.use(cors());
 app.use('/sl', linkRouter);
 app.use('/expired', (req, res) => {
     return res.render('thank-you');
+
+    // comment added
     // return res.send({ message: "Expired! link" });
 });
 
