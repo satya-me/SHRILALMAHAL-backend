@@ -5,6 +5,7 @@ const fs = require('fs'); // Using fs.promises for async file operations
 const path = require('path');
 
 exports.PDF = async (req, res) => {
+    console.log({ message: 'Downloading PDF .......... ' });
     console.log(req.params.tag_name);
     // const doc = new pdf();
     const doc = new pdf({

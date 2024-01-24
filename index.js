@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 const linkRouter = require('./routes/link.routes');
 const qrcodeRouter = require('./routes/qrcode.routes');
+const testRouter = require('./routes/test.routes');
 
 const errorMiddleware = require('./middlewares/error.middleware');
 
@@ -34,23 +35,11 @@ app.use(cors());
 app.use('/sl', linkRouter);
 app.use('/expired', (req, res) => {
     return res.render('expired');
-
-    // comment added
-    // return res.send({ message: "Expired! link" });
 });
 
 app.use('/api/qrcode', qrcodeRouter);
 
-app.get('/download-pdf', async (req, res) => {
-    const filename = 'my-pdf.pdf';
-    res.sendFile(filename, {
-        root: __dirname, // Adjust according to your file structure
-        headers: {
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename=${filename}`,
-        },
-    });
-});
+app.use('/api/test', testRouter);
 
 app.use(errorMiddleware);
 

@@ -30,4 +30,7 @@ const schema = new Schema({
   data: { type: Object, default: null },
 }, { timestamps: true });
 
+// Add an index on the 'tag' field
+schema.index({ tag: 1 });
+
 module.exports = model('qrcode', schema);

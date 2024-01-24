@@ -1,13 +1,14 @@
 const QRCodeService = require('../services/qrcode.service');
 const QRCodeTag = require('../services/qrcode.tag.service');
 const QRCodeModel = require('../models/QRCode');
+const TagModel = require('../models/Tag');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const { PDFDocument, rgb } = require('pdf-lib');
 const fs = require('fs');
 const QRCode = require('qrcode');
 const pdf = require('pdfkit');
-
+const { runBackgroundTask } = require('./testController');
 
 
 class QRCodeController {
@@ -20,34 +21,14 @@ class QRCodeController {
 
     try {
       const saveTag = await QRCodeTag.createTag(tag, count);
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
 
-      for (let index = 0; index < count; index++) {
 
-        const uniqueId = uuidv4();
-        const payload = {
-          tag: tag,
-          transitions: 0,
-          link: process.env.BASE_URL,
-          style: {
-            bgColor: "#fff",
-            patternColor: "#000",
-            type: "url",
-          },
-          logo: {
-            src: "images/shri-lal-mahal-logo.png",
-          },
-          shortLink: uniqueId,
-          user: '',
-        };
-        const code = await QRCodeService.createCode(payload);
-        // Send a real-time update to the client
-        res.write(`data: Processed ${index + 1} of ${count} QR codes\n\n`);
-        // Introduce a delay between iterations (adjust the delay time as needed)
-        await new Promise(resolve => setTimeout(resolve, 5));
-      }
+
+      console.log({ message: 'QR code generation started in the background.' });
+      runBackgroundTask(tag, count);
+      // Immediately respond to the client
+      return res.status(200).json({ message: 'QR code generation started in the background.' });
+
 
       // End the response outside the loop
       res.end("Done");
@@ -60,27 +41,37 @@ class QRCodeController {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10; // Set your preferred page size
     const tag = req.params.tag;
-    console.log({
-      query: req.query,
-      params: req.params,
-    });
-    const QRS_DATA = await QRCodeModel.find({ tag: tag });
-    const QRS_LENGTH = Math.ceil(QRS_DATA.length / Number(pageSize));
-    const projectQuery = { tag: tag };
-    const skip = (page - 1) * pageSize;
-    const QRS = await QRCodeModel.aggregate([
+
+    // Ensure indexing
+    // await QRCodeModel.createIndex({ tag: 1 });
+    // await TagModel.createIndex({ name: 1 });
+
+    // Use countDocuments directly
+    const TAG_DATA = await TagModel.findOne({ name: tag });
+    const TAG_DATA_COUNT = TAG_DATA.count;
+    // console.log(TAG_DATA_COUNT.count);
+
+    // No need to use lean() if not using QRS_DATA elsewhere
+    const QRS_RESULT = await QRCodeModel.aggregate([
       {
-        $match: { tag: tag }  // Use $match to filter by tag
+        $facet: {
+          metadata: [{ $count: "total" }],
+          data: [
+            { $match: { tag: tag } },
+            { $skip: (page - 1) * pageSize },
+            { $limit: pageSize },
+          ],
+        },
       },
-      {
-        $skip: skip
-      },
-      {
-        $limit: pageSize
-      }
-    ]);
-    console.log({ QRS: QRS_LENGTH });
-    return res.send({ QRS, QRS_LENGTH });
+    ]).allowDiskUse(true).exec();
+
+    const QRS_LENGTH = QRS_RESULT[0]?.metadata[0]?.total || 0;
+    const QRS = QRS_RESULT[0]?.data || [];
+
+    console.log({ QRS_LENGTH, TOTAL_QRS_LENGTH: QRS.length, TAG_DATA_COUNT });
+    return res.send({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
+
+
   }
 
   async getAllTag(req, res) {
