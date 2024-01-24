@@ -65,7 +65,7 @@ class QRCodeController {
       params: req.params,
     });
     const QRS_DATA = await QRCodeModel.find({ tag: tag });
-    const QRS_LENGTH = (QRS_DATA.length / Number(pageSize));
+    const QRS_LENGTH = Math.ceil(QRS_DATA.length / Number(pageSize));
     const projectQuery = { tag: tag };
     const skip = (page - 1) * pageSize;
     const QRS = await QRCodeModel.aggregate([
