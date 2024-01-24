@@ -37,6 +37,7 @@ class LinkController {
     const QRData = await linkService.QRData(body);
     // return res.send({ QRData: QRData });
     if (QRData.flag === 1) {
+      return res.render('thank-you');
       return res.send({ message: 'Thank you.' });
     }
     return res.redirect(QRData.data);

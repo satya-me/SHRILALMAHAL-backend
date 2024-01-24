@@ -33,7 +33,8 @@ app.use(cors());
 
 app.use('/sl', linkRouter);
 app.use('/expired', (req, res) => {
-    return res.send({ message: "Expired! link" });
+    return res.render('thank-you');
+    // return res.send({ message: "Expired! link" });
 });
 
 app.use('/api/qrcode', qrcodeRouter);
