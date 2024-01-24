@@ -84,9 +84,9 @@ class QRCodeController {
   }
 
   async getAllTag(req, res) {
-    // return console.log('tag');
     const TAGs = await QRCodeTag.getTags();
-    return res.send(TAGs);
+    const reversedTAGs = TAGs.reverse();
+    return res.send(reversedTAGs);
   }
 
   async test(req, res) {
