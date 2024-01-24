@@ -69,7 +69,7 @@ exports.PDF = async (req, res) => {
                 if (err) {
                     console.error(`Error deleting file: ${err}`);
                 } else {
-                    console.log('File deleted successfully');
+                    console.log(`${filename} File deleted successfully`);
                 }
             });
         });
