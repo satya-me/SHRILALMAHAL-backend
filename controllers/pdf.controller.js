@@ -2,19 +2,26 @@ const QRCodeService = require('../services/qrcode.service');
 const QRCode = require('qrcode');
 const pdf = require('pdfkit');
 const fs = require('fs'); // Using fs.promises for async file operations
+const path = require('path');
 
 exports.PDF = async (req, res) => {
     console.log(req.params.tag_name);
-    const doc = new pdf();
+    // const doc = new pdf();
+    const doc = new pdf({
+        size: [13 * 72, 19 * 72], // Set the custom paper size in points (1 inch = 72 points)
+        margin: 0, // No margin
+    });
+
     const filename = req.params.tag_name + '.pdf';
     const QRS = await QRCodeService.getAllCode(req.params.tag_name);
 
     // Set the image properties
-    const imageWidth = 100;
-    const imageHeight = 100;
-    const imagesPerRow = 5;
-    const imagesPerPage = 45;
-    const margin = 15;
+    const imageWidth = 60;
+    const imageHeight = 60;
+    const imagesPerRow = 12;
+    const imagesPerPage = 216;
+    const marginX = 16.5;
+    const marginY = 15;
 
     let currentPage = 1;
 
@@ -33,29 +40,42 @@ exports.PDF = async (req, res) => {
 
         const qrCodeBuffer = await generateQRCode(_LINK, 100);
 
-        // Calculate position for the current image
+        // Calculate position for the current image with equal margins
         const rowIndex = (i % imagesPerPage) % imagesPerRow;
         const colIndex = Math.floor((i % imagesPerPage) / imagesPerRow);
 
-        const x = rowIndex * (imageWidth + margin);
-        const y = colIndex * (imageHeight + margin);
+        const x = marginX + rowIndex * (imageWidth + marginX);
+        const y = marginY + colIndex * (imageHeight + marginY);
 
         // Add the QR code image to the PDF
         doc.image(qrCodeBuffer, x, y, { width: imageWidth, height: imageHeight });
     }
 
-
-
     // Finalize PDF file
     const pdfStream = doc.pipe(fs.createWriteStream(filename));
-    doc.end();
-
     pdfStream.on('finish', () => {
         // Send the PDF file as a response
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-        fs.createReadStream(filename).pipe(res);
+        const readStream = fs.createReadStream(filename);
+
+        // Pipe the read stream to the response
+        readStream.pipe(res);
+
+        // Close the file stream after piping
+        readStream.on('end', () => {
+            // Now, you can attempt to delete the file
+            fs.unlink(filename, (err) => {
+                if (err) {
+                    console.error(`Error deleting file: ${err}`);
+                } else {
+                    console.log('File deleted successfully');
+                }
+            });
+        });
     });
+    doc.end();
+
 
     console.log(`PDF generated with ${currentPage} pages.`);
 }

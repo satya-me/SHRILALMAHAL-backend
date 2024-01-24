@@ -17,7 +17,7 @@ class QRCodeTag {
 
     async getTags() {
         const codes = await CodeTag.find({});
-        console.log({ codes });
+        // console.log({ codes });
         return codes;
     }
 
