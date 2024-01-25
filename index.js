@@ -17,6 +17,7 @@ const app = express();
 // Set EJS as the view engine
 app.set("view engine", "ejs");
 app.set("views", "views");
+app.use(express.static('public'));
 
 // Use bodyParser middleware to parse form data
 app.use(bodyParser.urlencoded({ extended: true }));
