@@ -41,13 +41,13 @@ class QRCodeController {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10; // Set your preferred page size
     const tag = req.params.tag;
-    console.log(
-      {
-        page,
-        pageSize,
-        tag
-      }
-    );
+    // console.log(
+    //   {
+    //     page,
+    //     pageSize,
+    //     tag
+    //   }
+    // );
     // Ensure indexing
     // await QRCodeModel.createIndex({ tag: 1 });
     // await TagModel.createIndex({ name: 1 });
@@ -78,12 +78,12 @@ class QRCodeController {
     const QRS_LENGTH = QRS_RESULT[0]?.metadata[0]?.total || 0;
     const QRS = QRS_RESULT[0]?.data || [];
     // console.log(QRS.length);
-    QRS_RESULT.forEach(element => {
+    // QRS_RESULT.forEach(element => {
 
-      console.log(element);
-    });
-    // return;
-    console.log({ QRS, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
+    //   console.log(element);
+    // });
+    // // return;
+    // console.log({ QRS, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
     return res.send({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
 
 
