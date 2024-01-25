@@ -26,7 +26,7 @@ async function backgroundTask() {
 
 
             await __MAIN__(payload, index);
-            await new Promise(resolve => setTimeout(resolve, 200));
+            await new Promise(resolve => setTimeout(resolve, process.env.SLEEP_TIME));
             parentPort.postMessage('Background task completed.');
             parentPort.postMessage({
                 tag,
