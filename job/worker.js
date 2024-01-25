@@ -43,7 +43,7 @@ backgroundTask();
 
 async function __MAIN__(payload, index) {
     console.log({ message: "Calling __MAIN__ function.", index });
-    fetch('http://192.168.1.4:5001/api/test/qr/store', {
+    fetch(`${process.env.BASE_URL}/api/test/qr/store`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

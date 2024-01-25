@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 
 const linkRouter = require('./routes/link.routes');
 const qrcodeRouter = require('./routes/qrcode.routes');
-const testRouter = require('./routes/test.routes');
+const testRouter = require('./routes/bg.process.routes');
 
 const errorMiddleware = require('./middlewares/error.middleware');
 

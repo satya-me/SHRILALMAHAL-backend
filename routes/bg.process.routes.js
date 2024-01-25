@@ -1,6 +1,6 @@
 const Router = require('express').Router;
 
-const BGController = require('../controllers/testController');
+const BGController = require('../controllers/BGController');
 
 const router = new Router();
 
