@@ -12,6 +12,8 @@ const testRouter = require('./routes/bg.process.routes');
 
 const errorMiddleware = require('./middlewares/error.middleware');
 
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
 const app = express();
 
 // Set EJS as the view engine
@@ -34,9 +36,24 @@ app.use(cookieParser());
 app.use(cors());
 
 app.use('/sl', linkRouter);
+
+// Proxy requests from /satya to an external URL
+app.use('/satya', createProxyMiddleware({
+    target: 'https://www.nafed-india.com/',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/satya': '/',  // Rewrite path to remove /satya prefix
+    },
+}));
+
+
 app.use('/expired', (req, res) => {
     return res.render('expired');
 });
+app.use('/hi', (req, res) => {
+    return res.status(200).json({ message: "Server up......" });
+});
+
 
 app.use('/api/qrcode', qrcodeRouter);
 
