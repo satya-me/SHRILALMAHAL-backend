@@ -34,13 +34,13 @@ class LinkController {
 
   async submitForm(req, res) {
     const body = req.body;
-    return res.send({ body });
+    // return console.log(req.params);
     const QRData = await linkService.QRData(body);
+    console.log({ QRData });
     if (QRData.flag === 1) {
-      return res.render('thank-you');
-      return res.send({ message: 'Thank you.' });
+      return res.send({ data: QRData });
     }
-    return res.redirect(QRData.data);
+    return res.send({ data: QRData });
   }
 }
 
