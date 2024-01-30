@@ -17,16 +17,14 @@ class LinkService {
 
   async QRData(data) {
     const code = await QRCode.findOne({ shortLink: data.uuid });
-    // return console.log({ data });
     if (code.transitions >= 1) {
-      return { type: code.style.type, data: '/expired' };
+      return { type: code.style.type, data: 'expired', flag: false };
     }
     if (code) {
       code.transitions++;
       code.data = data;
       await code.save();
-      // return console.log(code);
-      return { type: code.style.type, data: code.link, flag: 1 };
+      return { type: code.style.type, data: 'thankyou', flag: true };
     }
 
     return null;
