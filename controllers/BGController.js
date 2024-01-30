@@ -12,7 +12,7 @@ exports.runBackgroundTask = async (tag, count) => {
         const worker = new Worker(workerScriptPath, { workerData: { tag, count } });
 
         worker.on('message', (message) => {
-            console.log({message});
+            console.log({ message });
         });
 
         worker.on('error', (error) => {
@@ -48,5 +48,6 @@ exports.runBackgroundTask = async (tag, count) => {
 exports.QRCode = async (req, res) => {
     console.log({ message: "Calling __MAIN__ => QRCode api." });
     const payload = req.body
+    console.log({payload});
     await QRCodeService.createCode(payload);
 }

@@ -11,7 +11,7 @@ async function backgroundTask() {
             const payload = {
                 tag: tag,
                 transitions: 0,
-                link: process.env.BASE_URL,
+                link: process.env.DOMAIN,
                 style: {
                     bgColor: "#fff",
                     patternColor: "#000",
