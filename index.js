@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 
+const authRouter = require('./routes/auth.routes');
 const linkRouter = require('./routes/link.routes');
 const qrcodeRouter = require('./routes/qrcode.routes');
 const testRouter = require('./routes/bg.process.routes');
@@ -49,6 +50,7 @@ app.use('/hi', (req, res) => {
     return res.status(200).json({ message: "Server up......" });
 });
 
+app.use('/api/auth', authRouter);
 
 app.use('/api/qrcode', qrcodeRouter);
 
