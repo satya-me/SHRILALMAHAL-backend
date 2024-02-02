@@ -1,53 +1,81 @@
-// testController.js
-const QRCodeTag = require('../services/qrcode.tag.service');
 const QRCodeService = require('../services/qrcode.service');
-const path = require('path');
-const { Worker } = require('worker_threads');
+const QRCodeModal = require('../models/QRCode');
+const TagModal = require('../models/Tag');
+const { v4: uuidv4 } = require('uuid');
 
-exports.runBackgroundTask = async (tag, count) => {
-    // await QRCodeTag.createTag(tag, count);
+exports.runBackgroundTask = async (tag, count, acTagCount) => {
     console.log({ message: 'runBackgroundTask' });
-    return new Promise((resolve, reject) => {
-        const workerScriptPath = path.join(__dirname, '..', 'job', 'worker.js');
-        const worker = new Worker(workerScriptPath, { workerData: { tag, count } });
+    return new Promise(async (resolve, reject) => {
+        const savePromises = [];
 
-        worker.on('message', (message) => {
-            console.log({ message });
-        });
+        for (let i = 0; i < count; i++) {
+            const uniqueId = uuidv4();
+            const payload = {
+                transitions: 0,
+                data: null,
+                tag,
+                link: process.env.DOMAIN,
+                style: {
+                    bgColor: "#fff",
+                    patternColor: "#000",
+                    type: "url",
+                },
+                logo: {
+                    src: "images/shri-lal-mahal-logo.png",
+                },
+                shortLink: uniqueId,
+                user: '65ad14c2ec42f44748a4d226',
+            };
 
-        worker.on('error', (error) => {
-            reject(error);
-        });
-
-        worker.on('exit', (code) => {
-            if (code !== 0) {
-                reject(new Error(`Worker stopped with exit code ${code}`));
-            } else {
-                resolve();
+            try {
+                const qrCount = await QRCodeModal.countDocuments({ tag: tag });
+                // if qr count is less then tag count => insert
+                console.log({ qrCount, acTagCount });
+                if (qrCount < acTagCount) {
+                    console.log({ uniqueId });
+                    console.log(`Number of documents where tag is 'Tag': ${qrCount}`);
+                    const tt = new QRCodeModal(payload);
+                    tt.save()
+                    // savePromises.push(tt.save());
+                } else {
+                    console.log(`Number of documents where tag is 'Tag': ${qrCount} but actual count is ${acTagCount}`);
+                    break;
+                }
+            } catch (error) {
+                console.error("Error creating QRCodeModal:", error);
             }
-        });
+        }
+        // console.log({savePromises});
+        // try {
+        //     await Promise.all(savePromises);
+        //     resolve();
+        // } catch (error) {
+        //     reject(error);
+        // }
+        try {
+            await Promise.all(savePromises);
+            console.log("All QRCodeModals saved successfully.");
+        } catch (error) {
+            console.error("Error saving QRCodeModals:", error);
+            throw error;
+        }
     });
 }
 
-// exports.createQRCode = async (req, res) => {
-
-//     try {
-//         // Run the background task without waiting for it to finish
-//         const tag = 'BADAL';
-//         const count = 20;
-//         exports.runBackgroundTask(tag, count);
-
-//         // Immediately respond to the client
-//         res.status(200).json({ message: 'QR code generation started in the background.' });
-//     } catch (e) {
-//         return res.status(500).json({ error: e.message });
-//     }
-// }
-
 
 exports.QRCode = async (req, res) => {
-    console.log({ message: "Calling __MAIN__ => QRCode api." });
+    // console.log({ message: "Calling __MAIN__ => QRCode api." });
     const payload = req.body
-    console.log({payload});
-    await QRCodeService.createCode(payload);
+    var _QR = await QRCodeService.getAllCodeCount(payload.tag);
+    var _Tag = await TagModal.findOne({ name: payload.tag });
+    // console.log({ __TagC: _Tag.count, __QRC: _QR.length});
+    if (_Tag.count == _QR.length) {
+        console.table({ __TagC: _Tag.count, __QRC: _QR.length, skip: true });
+    } else {
+        console.table({ __TagC: _Tag.count, __QRC: _QR.length, skip: false });
+        await QRCodeService.createCode(payload);
+    }
+
 }
+
+

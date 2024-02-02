@@ -9,6 +9,7 @@ const fs = require('fs');
 const QRCode = require('qrcode');
 const pdf = require('pdfkit');
 const { runBackgroundTask } = require('./BGController');
+const { manualTask } = require('../job/manualWork');
 
 
 class QRCodeController {
@@ -21,11 +22,13 @@ class QRCodeController {
 
     try {
       const saveTag = await QRCodeTag.createTag(tag, count);
+      const tagCount = await TagModel.findOne({ name: tag });
 
-
+      // return console.log(tagCount.count);
 
       console.log({ message: 'QR code generation started in the background.' });
-      runBackgroundTask(tag, count);
+      console.log({ tag, count, tagCount: tagCount.count });
+      runBackgroundTask(tag, count, tagCount.count);
       // Immediately respond to the client
       return res.status(200).json({ message: 'QR code generation started in the background.' });
 
@@ -41,20 +44,11 @@ class QRCodeController {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10; // Set your preferred page size
     const tag = req.params.tag;
-    // console.log(
-    //   {
-    //     page,
-    //     pageSize,
-    //     tag
-    //   }
-    // );
-    // Ensure indexing
-    // await QRCodeModel.createIndex({ tag: 1 });
-    // await TagModel.createIndex({ name: 1 });
+
 
     // Use countDocuments directly
     const TAG_DATA = await TagModel.findOne({ name: tag });
-    const TAG_DATA_COUNT = TAG_DATA.count;
+    const TAG_DATA_COUNT = TAG_DATA?.count;
     // console.log(TAG_DATA_COUNT.count);
 
     // No need to use lean() if not using QRS_DATA elsewhere
@@ -77,21 +71,49 @@ class QRCodeController {
 
     const QRS_LENGTH = QRS_RESULT[0]?.metadata[0]?.total || 0;
     const QRS = QRS_RESULT[0]?.data || [];
-    // console.log(QRS.length);
-    // QRS_RESULT.forEach(element => {
 
-    //   console.log(element);
-    // });
-    // // return;
-    // console.log({ QRS, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
-    return res.send({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
+    var _QR = await QRCodeModel.find({ tag });
+    var _Tag = await TagModel.findOne({ name: tag });
+    const lastRecord = _QR[_QR.length - 1];
+    const recordCount = _QR.length;
+    if (lastRecord) {
+      const currentDate = new Date();
 
+      const createdAtDate = new Date(lastRecord.createdAt);
 
+      const timeDifference = currentDate - createdAtDate;
+
+      const secondsDifference = Math.floor(timeDifference / 1000);
+      var _FLAG = {};
+      if (secondsDifference > 5 && recordCount < _Tag.count) {
+
+        _FLAG = {
+          is_bg: true,
+          massage: "Need to call BG"
+        }
+        var restOf = _Tag.count - recordCount;
+        runBackgroundTask(tag, restOf);
+      } else {
+        _FLAG = {
+          is_bg: false,
+          massage: "No need to call BG"
+        }
+      }
+      console.log({ _FLAG });
+    } else {
+      runBackgroundTask(tag, _Tag.count);
+    }
+
+    // console.log({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
+
+    return res.send({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT, _FLAG });
   }
 
   async getAllTag(req, res) {
     const TAGs = await QRCodeTag.getTags();
     const reversedTAGs = TAGs.reverse();
+    // console.log({ reversedTAGs });
+    // const result = await QRCodeModel.deleteMany({ tag: 'TAG12K' });
     return res.send(reversedTAGs);
   }
 

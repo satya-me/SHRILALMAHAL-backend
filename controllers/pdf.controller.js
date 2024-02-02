@@ -5,11 +5,11 @@ const fs = require('fs'); // Using fs.promises for async file operations
 const path = require('path');
 
 exports.PDF = async (req, res) => {
-    console.log({ message: 'Downloading PDF .......... ' });
-    console.log(req.params.tag_name);
+    console.log({ message: `Generating PDF ${req.params.tag_name}.pdf .......... ` });
+    // console.log(req.params.tag_name);
     // const doc = new pdf();
     const doc = new pdf({
-        size: [13 * 72, 19 * 72], // Set the custom paper size in points (1 inch = 72 points)
+        size: [12 * 72, 18 * 72], // Set the custom paper size in points (1 inch = 72 points)
         margin: 0, // No margin
     });
 
@@ -37,7 +37,7 @@ exports.PDF = async (req, res) => {
         }
 
         // Generate QR code
-        const _LINK = QRS[i].link + '/sl/' + QRS[i].shortLink;
+        const _LINK = QRS[i].link + `/${process.env.PREFIX}/fd/` + QRS[i].shortLink;
 
         const qrCodeBuffer = await generateQRCode(_LINK, 100);
 
@@ -66,13 +66,13 @@ exports.PDF = async (req, res) => {
         // Close the file stream after piping
         readStream.on('end', () => {
             // Now, you can attempt to delete the file
-            fs.unlink(filename, (err) => {
-                if (err) {
-                    console.error(`Error deleting file: ${err}`);
-                } else {
-                    console.log(`${filename} File deleted successfully`);
-                }
-            });
+            // fs.unlink(filename, (err) => {
+            //     if (err) {
+            //         console.error(`Error deleting file: ${err}`);
+            //     } else {
+            //         console.log(`${filename} File deleted successfully`);
+            //     }
+            // });
         });
     });
     doc.end();

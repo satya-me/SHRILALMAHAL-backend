@@ -9,6 +9,12 @@ class QRCodeService {
     return codes;
   }
 
+  async getAllCodeCount(tag) {
+    const codes = await QRCode.find({ tag: tag });
+    console.log({ tag });
+    return codes;
+  }
+
 
   async createCode(code) {
 

@@ -15,6 +15,7 @@ const errorMiddleware = require('./middlewares/error.middleware');
 
 const app = express();
 
+
 // Set EJS as the view engine
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -33,7 +34,8 @@ app.use(cookieParser());
 // );
 
 app.use(cors());
-
+// Set the timeout for server requests
+app.timeout = 600000; // 600 seconds
 app.use('/sl', linkRouter);
 
 // Proxy requests from /satya to an external URL
