@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const linkRouter = require('./routes/link.routes');
 const qrcodeRouter = require('./routes/qrcode.routes');
 const testRouter = require('./routes/bg.process.routes');
+const payRouter = require('./routes/pay.routes');
 
 const errorMiddleware = require('./middlewares/error.middleware');
 
@@ -51,6 +52,7 @@ app.use('/hi', (req, res) => {
 
 
 app.use('/api/qrcode', qrcodeRouter);
+app.use('/api/pay', payRouter);
 
 app.use('/api/test', testRouter);
 

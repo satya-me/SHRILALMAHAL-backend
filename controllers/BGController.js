@@ -3,10 +3,19 @@ const QRCodeModal = require('../models/QRCode');
 const TagModal = require('../models/Tag');
 const { v4: uuidv4 } = require('uuid');
 
-exports.runBackgroundTask = async (tag, count, acTagCount) => {
+exports.runBackgroundTask = async (tag, count, acTagCount, cashback_lucky_users, cashback_amount) => {
     console.log({ message: 'runBackgroundTask' });
     return new Promise(async (resolve, reject) => {
         const savePromises = [];
+
+        // Generate an array of indices from 0 to count-1
+        const indices = Array.from({ length: count }, (_, i) => i);
+
+        // Fisher-Yates shuffle algorithm
+        for (let i = count - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
 
         for (let i = 0; i < count; i++) {
             const uniqueId = uuidv4();
@@ -25,6 +34,7 @@ exports.runBackgroundTask = async (tag, count, acTagCount) => {
                 },
                 shortLink: uniqueId,
                 user: '65ad14c2ec42f44748a4d226',
+                is_lucky_users: indices[i] < cashback_lucky_users
             };
 
             try {

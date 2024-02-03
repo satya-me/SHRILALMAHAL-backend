@@ -28,6 +28,8 @@ const schema = new Schema({
   shortLink: { type: String },
   user: { type: Types.ObjectId, ref: 'User' },
   data: { type: Object, default: null },
+  is_lucky_users: { type: Boolean, default: false }
+
 }, { timestamps: true });
 
 // Add an index on the 'tag' field

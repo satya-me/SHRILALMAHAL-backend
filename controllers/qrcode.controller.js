@@ -16,19 +16,22 @@ class QRCodeController {
 
 
   async createQRCode(req, res) {
-    const tag = req.body.tag;
-    const count = req.body.count;
-    // console.log(req.body);
+    const { tag, count, cashback_lucky_users, cashback_amount } = req.body;
+    
 
     try {
-      const saveTag = await QRCodeTag.createTag(tag, count);
+      if (count <= cashback_lucky_users) {
+        return res.status(401).json({ message: 'Lucky user number must be less then QR count.' });
+      }
+
+      const saveTag = await QRCodeTag.createTag(tag, count, cashback_lucky_users, cashback_amount);
       const tagCount = await TagModel.findOne({ name: tag });
 
       // return console.log(tagCount.count);
 
       console.log({ message: 'QR code generation started in the background.' });
       console.log({ tag, count, tagCount: tagCount.count });
-      runBackgroundTask(tag, count, tagCount.count);
+      runBackgroundTask(tag, count, tagCount.count, cashback_lucky_users, cashback_amount);
       // Immediately respond to the client
       return res.status(200).json({ message: 'QR code generation started in the background.' });
 
@@ -92,7 +95,7 @@ class QRCodeController {
           massage: "Need to call BG"
         }
         var restOf = _Tag.count - recordCount;
-        runBackgroundTask(tag, restOf);
+        runBackgroundTask(tag, restOf, TAG_DATA.cashback_lucky_users, TAG_DATA.cashback_amount);
       } else {
         _FLAG = {
           is_bg: false,
@@ -101,7 +104,7 @@ class QRCodeController {
       }
       console.log({ _FLAG });
     } else {
-      runBackgroundTask(tag, _Tag.count);
+      runBackgroundTask(tag, _Tag.count, TAG_DATA.cashback_lucky_users, TAG_DATA.cashback_amount);
     }
 
     // console.log({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
