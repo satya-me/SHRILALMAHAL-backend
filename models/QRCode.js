@@ -28,7 +28,8 @@ const schema = new Schema({
   shortLink: { type: String },
   user: { type: Types.ObjectId, ref: 'User' },
   data: { type: Object, default: null },
-  is_lucky_users: { type: Boolean, default: false }
+  is_lucky_users: { type: Boolean, default: false },
+  payment_resp: { type: Object, default: false }
 
 }, { timestamps: true });
 

@@ -25,7 +25,12 @@ class LinkService {
       code.transitions++;
       code.data = data;
       await code.save();
-      // const result = await exports.UPIPay(AC);
+      if (code.is_lucky_users) {
+        // const result = await exports.UPIPay(AC);
+        // code.payment_resp
+        // code.data = result;
+        // await code.save();
+      }
       return { type: code.style.type, data: 'thankyou', flag: true };
     }
 
