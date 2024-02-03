@@ -3,22 +3,23 @@ const axios = require('axios');
 
 
 exports.UPIPay = async (req) => {
+    const { } = req;
     let data = JSON.stringify({
         "account_number": req,
-        "amount": 10000,
+        "amount": 10000, // in 1 rupee = 100 paisa ex: 1*100 = 100
         "currency": "INR",
         "mode": "UPI",
         "purpose": "cashback",
         "fund_account": {
             "account_type": "vpa",
             "vpa": {
-                "address": "satyajit08@axl"
+                "address": "satyajit08@axl" //
             },
             "contact": {
-                "name": "Gaurav Kumar",
-                "email": "gaurav.kumar@example.com",
-                "contact": "9876543210",
-                "type": "employee",
+                "name": "Gaurav Kumar", //
+                "email": "gaurav.kumar@example.com", //
+                "contact": "9876543210", //
+                "type": "user",
                 "reference_id": "Acme Contact ID 12345",
                 "notes": {
                     "notes_key_1": "Tea, Earl Grey, Hot",
@@ -70,7 +71,8 @@ exports.UPIPay = async (req) => {
 exports.CompositePay = async (req, res) => {
     // Call the UPIPay function using exports.UPIPay
     try {
-        const result = await exports.UPIPay('2323230027319975');
+        const AC = process.env.RAZORPAY_AC_NO;
+        const result = await exports.UPIPay(AC);
         res.send(result);
     } catch (error) {
         res.send(error.message);

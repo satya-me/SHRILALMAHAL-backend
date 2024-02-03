@@ -17,10 +17,10 @@ class QRCodeController {
 
   async createQRCode(req, res) {
     const { tag, count, cashback_lucky_users, cashback_amount } = req.body;
-    
+    console.log({ tag, count, cashback_lucky_users, cashback_amount });
 
     try {
-      if (count <= cashback_lucky_users) {
+      if (Number(count) <= Number(cashback_lucky_users)) {
         return res.status(401).json({ message: 'Lucky user number must be less then QR count.' });
       }
 
