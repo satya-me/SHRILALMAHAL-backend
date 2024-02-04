@@ -11,6 +11,8 @@ const linkRouter = require('./routes/link.routes');
 const qrcodeRouter = require('./routes/qrcode.routes');
 const testRouter = require('./routes/bg.process.routes');
 const payRouter = require('./routes/pay.routes');
+const reportRouter = require('./routes/report.routes');
+const dashboardRouter = require('./routes/dashboard.routes');
 
 const errorMiddleware = require('./middlewares/error.middleware');
 
@@ -52,7 +54,8 @@ app.use('/hi', (req, res) => {
 });
 
 app.use('/api/auth', authRouter);
-
+app.use('/api/report', reportRouter);
+app.use('/api/dashboard', dashboardRouter);
 app.use('/api/qrcode', qrcodeRouter);
 app.use('/api/pay', payRouter);
 

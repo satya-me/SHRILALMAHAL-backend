@@ -2,7 +2,7 @@ const axios = require('axios');
 
 
 
-async function UPIPay(req) {
+exports.UPIPay = async (req) => {
     const AC = process.env.RAZORPAY_AC_NO;
     let data = JSON.stringify({
         "account_number": AC,
@@ -28,7 +28,7 @@ async function UPIPay(req) {
             }
         },
         "queue_if_low_balance": true,
-        "reference_id":req.uuid,
+        "reference_id": req.uuid,
         "narration": "Cashback Fund Transfer",
         "notes": {
             "notes_key_1": "Beam me up Scotty",
@@ -68,7 +68,7 @@ async function UPIPay(req) {
         });
 }
 
-const CompositePay = async (req, res) => {
+exports.CompositePay = async (req, res) => {
     // Call the UPIPay function using exports.UPIPay
     try {
         const AC = process.env.RAZORPAY_AC_NO;
@@ -77,9 +77,5 @@ const CompositePay = async (req, res) => {
     } catch (error) {
         res.send(error.message);
     }
-}
-
-module.exports = {
-    UPIPay,
-    CompositePay
 };
+
