@@ -7,7 +7,7 @@ exports.ReportData = async (req, res) => {
     try {
         const data = await Report();
 
-        console.log(data);
+        // console.log(data);
         return res.json({ success: true, message: "Data fetched successfully.", data: data });
     } catch (error) {
         console.log(error.message);
@@ -28,8 +28,8 @@ exports.DownloadExcel = async (req, res) => {
     const headerRow = Object.keys(data[0]).map(header => header.toUpperCase());
     worksheet.addRow(headerRow);
 
-    // Add header row
-    worksheet.addRow(Object.keys(data[0]));
+    // // Add header row
+    // worksheet.addRow(Object.keys(data[0]));
 
     // Add data rows
     data.forEach(item => {
