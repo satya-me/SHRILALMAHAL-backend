@@ -2,10 +2,10 @@ const axios = require('axios');
 
 
 
-exports.UPIPay = async (req) => {
-    const { } = req;
+async function UPIPay(req) {
+    const AC = process.env.RAZORPAY_AC_NO;
     let data = JSON.stringify({
-        "account_number": req,
+        "account_number": AC,
         "amount": 10000, // in 1 rupee = 100 paisa ex: 1*100 = 100
         "currency": "INR",
         "mode": "UPI",
@@ -13,12 +13,12 @@ exports.UPIPay = async (req) => {
         "fund_account": {
             "account_type": "vpa",
             "vpa": {
-                "address": "satyajit08@axl" //
+                "address": req.upi_id //
             },
             "contact": {
-                "name": "Gaurav Kumar", //
-                "email": "gaurav.kumar@example.com", //
-                "contact": "9876543210", //
+                "name": req.full_name, //
+                "email": "", //
+                "contact": req.mobile_number, //
                 "type": "user",
                 "reference_id": "Acme Contact ID 12345",
                 "notes": {
@@ -28,7 +28,7 @@ exports.UPIPay = async (req) => {
             }
         },
         "queue_if_low_balance": true,
-        "reference_id": "UUID",
+        "reference_id":req.uuid,
         "narration": "Cashback Fund Transfer",
         "notes": {
             "notes_key_1": "Beam me up Scotty",
@@ -47,7 +47,7 @@ exports.UPIPay = async (req) => {
         'Content-Type': 'application/json',
         'Authorization': `Basic ${base64Credentials}`
     };
-    console.log({ headers });
+    // console.log({ headers });
 
     let config = {
         method: 'post',
@@ -63,18 +63,23 @@ exports.UPIPay = async (req) => {
             return JSON.stringify(response.data);
         })
         .catch((error) => {
-            console.log(error);
-            return error;
+            console.log(error.message);
+            return error.message;
         });
 }
 
-exports.CompositePay = async (req, res) => {
+const CompositePay = async (req, res) => {
     // Call the UPIPay function using exports.UPIPay
     try {
         const AC = process.env.RAZORPAY_AC_NO;
-        const result = await exports.UPIPay(AC);
+        const result = await UPIPay(AC);
         res.send(result);
     } catch (error) {
         res.send(error.message);
     }
 }
+
+module.exports = {
+    UPIPay,
+    CompositePay
+};
