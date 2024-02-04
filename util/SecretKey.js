@@ -1,5 +1,5 @@
 const config = {
-    secret_key: "process.env.SECRET"
+    secret_key: "fezeewshard0&retryWritestrue&wmajority&ssltrueisi"
 }
 
 module.exports = config;
