@@ -5,6 +5,7 @@ const router = new Router();
 
 
 router.get('/data', ReportController.ReportData);
+router.get('/download-excel', ReportController.DownloadExcel);
 
 
 module.exports = router;

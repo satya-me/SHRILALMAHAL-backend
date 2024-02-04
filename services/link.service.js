@@ -1,6 +1,6 @@
 const QRCode = require('../models/QRCode');
-const { UPIPay } = require('../controllers/Payment.controller');
-
+const Tag = require('../models/Tag');
+const paymentController = require('../controllers/Payment.controller');
 class LinkService {
   async redirectTo(shortLink) {
 
@@ -17,21 +17,28 @@ class LinkService {
   }
 
   async QRData(data) {
-   
-    // return console.log(data);
+
     const code = await QRCode.findOne({ shortLink: data.uuid });
     if (code.transitions >= 1) {
       return { type: code.style.type, data: 'expired', flag: false };
     }
     if (code) {
-      // code.transitions++;
-      // code.data = data;
-      // await code.save();
+      code.transitions++;
+      code.data = data;
+      await code.save();
       if (code.is_lucky_users) {
-        
-        // code.payment_resp
-        // code.data = result;
-        // await code.save();
+        const TagDetails = await Tag.findOne({ name: code.tag });
+        const payload = {
+          amount: TagDetails.cashback_amount,
+          upi_id: data.upi_id,
+          full_name: data.full_name,
+          mobile_number: data.mobile_number,
+          uuid: data.uuid,
+        }
+        const result = await paymentController.UPIPay(payload);
+     
+        code.payment_resp = result;
+        await code.save();
         return { type: code.style.type, data: 'thankyou', flag: true, result: result.data };
       }
       return { type: code.style.type, data: 'thankyou', flag: true };

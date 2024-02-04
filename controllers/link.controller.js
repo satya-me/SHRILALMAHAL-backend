@@ -1,7 +1,7 @@
 const linkService = require('../services/link.service');
 
 const ApiError = require('../exceptions/api.exception');
-const { UPIPay } = require('./Payment.controller');
+
 
 class LinkController {
   async redirectLink(req, res, next) {
@@ -35,11 +35,9 @@ class LinkController {
 
   async submitForm(req, res) {
     const body = req.body;
-    const result = await UPIPay(body);
-    return console.log(result);
-    // return console.log(body);
+   
     const QRData = await linkService.QRData(body);
-    return console.log({ QRData });
+    // return console.log({ QRData });
     if (QRData.flag === 1) {
       return res.send({ data: QRData });
     }

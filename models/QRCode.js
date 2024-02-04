@@ -36,4 +36,7 @@ const schema = new Schema({
 // Add an index on the 'tag' field
 schema.index({ tag: 1 });
 
+// Add indexes for transitions, is_lucky_users, and payment_resp
+schema.index({ transitions: 1, is_lucky_users: 1, 'payment_resp.id': 1 });
+
 module.exports = model('qrcode', schema);

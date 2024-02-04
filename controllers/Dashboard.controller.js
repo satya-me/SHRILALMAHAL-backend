@@ -6,14 +6,44 @@ exports.DashboardData = async (req, res) => {
     try {
         const AllQRCodesCount = await QRCodeModel.countDocuments({});
         const UsedQRCodesCount = await QRCodeModel.countDocuments({ transitions: 1 });
-        const TotalCashBack = "2,81,222";
 
-        const HighlightedLocations = [
-            { id: 1, lat: 20.5937, lng: 78.9629, },
-            { id: 2, lat: 19.0760, lng: 72.8777, },
-            { id: 3, lat: 28.6139, lng: 77.2090, },
-            { id: 4, lat: 22.5726, lng: 88.3639, },
-        ];
+        const CashBack = await QRCodeModel.aggregate([
+            {
+                $match: {
+                    transitions: 1,
+                    is_lucky_users: true,
+                    payment_resp: { $ne: null }  // Filter out documents where payment_resp is null
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: "$payment_resp.amount" }
+                }
+            }
+        ]);
+
+        // console.log(CashBack[0].totalAmount);
+        const TotalCashBack = CashBack[0].totalAmount / 100;
+
+        const Locations = await QRCodeModel.find({ transitions: 1 });
+
+        const HighlightedLocations = Locations.reduce((acc, location) => {
+            const lat = location?.data?.location?.lat;
+            const lng = location?.data?.location?.lng;
+
+            if (lat !== undefined && lng !== undefined) {
+                acc.push({
+                    id: location.id,  // Adjust the property name based on your actual schema
+                    lat: lat,
+                    lng: lng
+                });
+            }
+
+            return acc;
+        }, []);
+
+        // console.log(HighlightedLocations);
 
         const data = {
             HighlightedLocations,
