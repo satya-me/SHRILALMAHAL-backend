@@ -3,7 +3,7 @@ const linkService = require('../services/link.service');
 const ApiError = require('../exceptions/api.exception');
 const QRCode = require('../models/QRCode');
 const Tag = require('../models/Tag');
-
+const paymentController = require('../controllers/Payment.controller');
 
 class LinkController {
   async redirectLink(req, res, next) {
@@ -53,6 +53,8 @@ class LinkController {
 
     const code = await QRCode.findOne({ shortLink: body.uuid });
     if (code.is_lucky_users) {
+      code.data = body;
+      await code.save();
       const TagDetails = await Tag.findOne({ name: code.tag });
       const payload = {
         amount: TagDetails.cashback_amount,
@@ -63,14 +65,15 @@ class LinkController {
         uuid: body.uuid,
       }
       console.log({ payload });
-      // const result = await paymentController.UPIPay(payload);
+      if (body.upi_id) {
+        const result = await paymentController.UPIPay(payload);
+        code.payment_resp = result;
+        await code.save();
+      }
 
-      // code.payment_resp = result;
-      // await code.save();
       // return { type: code.style.type, data: 'thankyou', flag: true, result: result.data };
     }
-    console.log({ mode, upi_id, bank, uuid });
-    res.send({ mode, upi_id, bank, uuid });
+    res.send({ type: code.style.type, data: 'thankyou', flag: true, result: result.data });
   }
 
 }
