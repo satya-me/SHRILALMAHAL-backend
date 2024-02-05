@@ -34,14 +34,14 @@ exports.DashboardData = async (req, res) => {
         const Locations = await QRCodeModel.find({ transitions: 1 });
 
         const HighlightedLocations = Locations.reduce((acc, location) => {
-            const lat = location?.data?.location?.lat;
-            const lng = location?.data?.location?.lng;
+            const latitude = location?.data?.location?.latitude;
+            const longitude = location?.data?.location?.longitude;
 
-            if (lat !== undefined && lng !== undefined) {
+            if (latitude !== undefined && longitude !== undefined) {
                 acc.push({
                     id: location.id,  // Adjust the property name based on your actual schema
-                    lat: lat,
-                    lng: lng
+                    lat: latitude,
+                    lng: longitude
                 });
             }
 
@@ -57,6 +57,8 @@ exports.DashboardData = async (req, res) => {
             AllQRCodesCount,
             USERS_WHO_WON_CASHBACK
         };
+
+        console.log(data);
 
         return res.json({ success: true, message: "Data fetched successfully.", data: data });
     } catch (error) {

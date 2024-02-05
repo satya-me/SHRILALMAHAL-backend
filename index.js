@@ -52,6 +52,17 @@ app.use('/expired', (req, res) => {
 app.use('/hi', (req, res) => {
     return res.status(200).json({ message: "Server up......" });
 });
+app.use('/update', (req, res) => {
+    // const QRModel = require('./models/QRCode');
+    // QRModel.updateMany({ tag: "Trial 31.01.2024  - 10500" }, { $set: { data: null, is_lucky_users: true, payment_resp: false } }, (err, result) => {
+    //     if (err) {
+    //         console.error("Error updating documents:", err);
+    //     } else {
+    //         console.log("Documents updated successfully:", result);
+    //     }
+    // });
+    return res.status(200).json({ message: "Updating......" });
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api/report', reportRouter);
