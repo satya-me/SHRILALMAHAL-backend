@@ -2,6 +2,7 @@ const linkService = require('../services/link.service');
 
 const ApiError = require('../exceptions/api.exception');
 const QRCode = require('../models/QRCode');
+const Tag = require('../models/Tag');
 
 
 class LinkController {
@@ -48,30 +49,28 @@ class LinkController {
   }
 
   async Cashback(req, res) {
-    const { mode, upi, bank, uuid } = req.body;
+    const body = req.body;
 
-
-
-    const code = await QRCode.findOne({ shortLink: uuid });
+    const code = await QRCode.findOne({ shortLink: body.uuid });
     if (code.is_lucky_users) {
       const TagDetails = await Tag.findOne({ name: code.tag });
       const payload = {
         amount: TagDetails.cashback_amount,
-        mode: modeOfPayment,
-        upi_id: upi,
+        mode: body.mode,
+        upi_id: body.upi_id,
         full_name: code.data.full_name,
         mobile_number: code.data.mobile_number,
-        uuid: uuid,
+        uuid: body.uuid,
       }
       console.log({ payload });
       // const result = await paymentController.UPIPay(payload);
 
       // code.payment_resp = result;
       // await code.save();
-      return { type: code.style.type, data: 'thankyou', flag: true, result: result.data };
+      // return { type: code.style.type, data: 'thankyou', flag: true, result: result.data };
     }
-    console.log({ mode, upi, bank, uuid });
-    res.send({ mode, upi, bank, uuid });
+    console.log({ mode, upi_id, bank, uuid });
+    res.send({ mode, upi_id, bank, uuid });
   }
 
 }

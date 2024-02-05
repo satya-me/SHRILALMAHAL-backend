@@ -7,7 +7,7 @@ const router = new Router();
 
 router.get('/:link', LinkController.redirectLink);
 router.post('/sm/:uuid', LinkController.submitForm);
-router.post('/sm/cashback', LinkController.Cashback);
+router.post('/sm/cashback/form', LinkController.Cashback);
 
 
 
