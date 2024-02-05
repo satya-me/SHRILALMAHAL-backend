@@ -53,7 +53,8 @@ class LinkController {
 
     const code = await QRCode.findOne({ shortLink: body.uuid });
     if (code.is_lucky_users) {
-      code.data = body;
+      code.transaction_details = body;
+
       await code.save();
       const TagDetails = await Tag.findOne({ name: code.tag });
       const payload = {
@@ -64,16 +65,20 @@ class LinkController {
         mobile_number: code.data.mobile_number,
         uuid: body.uuid,
       }
-      // console.log({ payload });
+      // return console.log({ payload });
       if (body.mode == "upi") {
+        // console.log({body});
         const result = await paymentController.UPIPay(payload);
         code.payment_resp = result;
         await code.save();
+        // console.log({ type: code.style.type, data: 'thankyou', flag: true });
+        return res.status(200).json({ type: code.style.type, data: 'thankyou', flag: true });
       }
 
       // return { type: code.style.type, data: 'thankyou', flag: true, result: result.data };
     }
-    res.send({ type: code.style.type, data: 'thankyou', flag: true, result: result.data });
+
+    return res.status(200).json({ type: code.style.type, data: 'thankyou', flag: true });
   }
 
 }
