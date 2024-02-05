@@ -26,22 +26,7 @@ class LinkService {
       code.transitions++;
       code.data = data;
       await code.save();
-      if (code.is_lucky_users) {
-        const TagDetails = await Tag.findOne({ name: code.tag });
-        const payload = {
-          amount: TagDetails.cashback_amount,
-          upi_id: data.upi_id,
-          full_name: data.full_name,
-          mobile_number: data.mobile_number,
-          uuid: data.uuid,
-        }
-        const result = await paymentController.UPIPay(payload);
-     
-        code.payment_resp = result;
-        await code.save();
-        return { type: code.style.type, data: 'thankyou', flag: true, result: result.data };
-      }
-      return { type: code.style.type, data: 'thankyou', flag: true };
+      return { type: code.style.type, data: 'thankyou', flag: true, uuid: data.uuid };
     }
 
     return null;

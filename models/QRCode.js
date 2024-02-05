@@ -29,7 +29,8 @@ const schema = new Schema({
   user: { type: Types.ObjectId, ref: 'User' },
   data: { type: Object, default: null },
   is_lucky_users: { type: Boolean, default: false },
-  payment_resp: { type: Object, default: false }
+  payment_resp: { type: Object, default: false },
+  transaction_details: { type: Object, default: false }
 
 }, { timestamps: true });
 

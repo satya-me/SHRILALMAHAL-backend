@@ -6,6 +6,11 @@ exports.DashboardData = async (req, res) => {
     try {
         const AllQRCodesCount = await QRCodeModel.countDocuments({});
         const UsedQRCodesCount = await QRCodeModel.countDocuments({ transitions: 1 });
+        const USERS_WHO_WON_CASHBACK = await QRCodeModel.countDocuments({
+            transitions: 1,
+            is_lucky_users: true,
+            'payment_resp': { $ne: null }
+        });
 
         const CashBack = await QRCodeModel.aggregate([
             {
@@ -49,7 +54,8 @@ exports.DashboardData = async (req, res) => {
             HighlightedLocations,
             TotalCashBack,
             UsedQRCodesCount,
-            AllQRCodesCount
+            AllQRCodesCount,
+            USERS_WHO_WON_CASHBACK
         };
 
         return res.json({ success: true, message: "Data fetched successfully.", data: data });
