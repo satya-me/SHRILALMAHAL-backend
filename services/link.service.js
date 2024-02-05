@@ -26,7 +26,7 @@ class LinkService {
       code.transitions++;
       code.data = data;
       await code.save();
-      return { type: code.style.type, data: 'thankyou', flag: true, uuid: data.uuid };
+      return { type: code.style.type, data: 'thankyou', flag: true, uuid: data.uuid, is_lucky: code.is_lucky_users };
     }
 
     return null;
