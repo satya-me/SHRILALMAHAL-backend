@@ -58,14 +58,14 @@ class LinkController {
       const TagDetails = await Tag.findOne({ name: code.tag });
       const payload = {
         amount: TagDetails.cashback_amount,
-        mode: body.mode,
+        mode: body.mode.toUpperCase(),
         upi_id: body.upi_id,
         full_name: code.data.full_name,
         mobile_number: code.data.mobile_number,
         uuid: body.uuid,
       }
-      console.log({ payload });
-      if (body.upi_id) {
+      // console.log({ payload });
+      if (body.mode == "upi") {
         const result = await paymentController.UPIPay(payload);
         code.payment_resp = result;
         await code.save();
