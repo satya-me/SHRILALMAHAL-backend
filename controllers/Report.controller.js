@@ -61,21 +61,23 @@ async function Report() {
         { tag: 1, 'payment_resp.id': 1, 'payment_resp.created_at': 1, 'payment_resp.amount': 1 }
     );
 
+
     // Create a dynamic data array based on the Reports
-    const data = Reports.map(report => {
-        return {
-            tag: report?.tag,  // Assuming 'tag' is a property in your Reports documents
-            transaction_id: report?.payment_resp.id,
-            transaction_date: convertUnixTimestamp(report?.payment_resp?.created_at),
-            transaction_amount: (report?.payment_resp?.amount / 100).toString() || "",  // Convert to string if needed
-        };
-    });
+    const data = Reports
+        .filter(report => report.payment_resp) // Filter out documents without payment_resp
+        .map(report => ({
+            tag: report.tag,
+            transaction_id: report.payment_resp.id ?? 'NA',
+            transaction_date: convertUnixTimestamp(report.payment_resp.created_at),
+            transaction_amount: (report.payment_resp.amount / 100).toString() || "",
+        }));
+
 
     // Function to convert Unix timestamp to human-readable date
     function convertUnixTimestamp(unixTimestamp) {
         const date = new Date(unixTimestamp * 1000); // Convert to milliseconds
         return date.toLocaleString(); // Adjust the format as needed
     }
-
-    return data;
+    console.log(data);
+    return data.reverse();
 }

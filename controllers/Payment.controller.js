@@ -56,10 +56,10 @@ const UPIPay = async (payload) => {
 
     try {
         const response = await axios.request(config);
-        // console.log(JSON.stringify(response.data));
+        console.log(JSON.stringify(response.data));
         return response.data;
     } catch (error) {
-        // console.error("Error response:", error.response.data);
+        console.error("Error response:", error.response.data);
         throw error;
     }
 

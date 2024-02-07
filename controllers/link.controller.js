@@ -68,10 +68,14 @@ class LinkController {
       // return console.log({ payload });
       if (body.mode == "upi") {
         // console.log({body});
-        const result = await paymentController.UPIPay(payload);
-        code.payment_resp = result;
-        await code.save();
-        // console.log({ type: code.style.type, data: 'thankyou', flag: true });
+        if (!code.payment_resp) {
+          const result = await paymentController.UPIPay(payload);
+          // console.log({ result });
+          code.payment_resp = result;
+          await code.save();
+          // console.log({ type: code.style.type, data: 'thankyou', flag: true });
+          return res.status(200).json({ type: code.style.type, data: 'thankyou', flag: true });
+        }
         return res.status(200).json({ type: code.style.type, data: 'thankyou', flag: true });
       }
 
