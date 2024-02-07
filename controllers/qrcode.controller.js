@@ -43,75 +43,6 @@ class QRCodeController {
     }
   }
 
-  async getQRCode(req, res) {
-    const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10; // Set your preferred page size
-    const tag = req.params.tag;
-
-
-    // Use countDocuments directly
-    const TAG_DATA = await TagModel.findOne({ name: tag });
-    const TAG_DATA_COUNT = TAG_DATA?.count;
-    // console.log(TAG_DATA_COUNT.count);
-
-    // No need to use lean() if not using QRS_DATA elsewhere
-    const QRS_RESULT = await QRCodeModel.aggregate([
-      {
-        $facet: {
-          metadata: [
-            { $match: { tag: tag } },
-            { $group: { _id: null, total: { $sum: 1 } } },
-            { $project: { _id: 0, total: 1 } },
-          ],
-          data: [
-            { $match: { tag: tag } },
-            { $skip: (page - 1) * pageSize },
-            { $limit: pageSize },
-          ],
-        },
-      },
-    ]).allowDiskUse(true).exec();
-
-    const QRS_LENGTH = QRS_RESULT[0]?.metadata[0]?.total || 0;
-    const QRS = QRS_RESULT[0]?.data || [];
-
-    var _QR = await QRCodeModel.find({ tag });
-    var _Tag = await TagModel.findOne({ name: tag });
-    const lastRecord = _QR[_QR.length - 1];
-    const recordCount = _QR.length;
-    if (lastRecord) {
-      const currentDate = new Date();
-
-      const createdAtDate = new Date(lastRecord.createdAt);
-
-      const timeDifference = currentDate - createdAtDate;
-
-      const secondsDifference = Math.floor(timeDifference / 1000);
-      var _FLAG = {};
-      if (secondsDifference > 5 && recordCount < _Tag.count) {
-
-        _FLAG = {
-          is_bg: true,
-          massage: "Need to call BG"
-        }
-        var restOf = _Tag.count - recordCount;
-        runBackgroundTask(tag, restOf, TAG_DATA.cashback_lucky_users, TAG_DATA.cashback_amount);
-      } else {
-        _FLAG = {
-          is_bg: false,
-          massage: "No need to call BG"
-        }
-      }
-      console.log({ _FLAG });
-    } else {
-      runBackgroundTask(tag, _Tag.count, TAG_DATA.cashback_lucky_users, TAG_DATA.cashback_amount);
-    }
-
-    // console.log({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT });
-
-    return res.send({ QRS, QRS_LENGTH, TOTAL_QRS_LENGTH: QRS_LENGTH, TAG_DATA_COUNT, _FLAG });
-  }
-
   async getAllTag(req, res) {
     const TAGs = await QRCodeTag.getTags();
     const reversedTAGs = TAGs.reverse();
@@ -134,9 +65,6 @@ class QRCodeController {
 
   }
 
-
-
-
   async deleteQRCode(req, res, next) {
     try {
       const code = await QRCodeService.deleteCode(
@@ -149,6 +77,7 @@ class QRCodeController {
       next(e);
     }
   }
+
 }
 
 module.exports = new QRCodeController();

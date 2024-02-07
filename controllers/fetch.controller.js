@@ -4,7 +4,6 @@ const { runBackgroundTask } = require('./BGController');
 
 exports.getQRCode = async (req, res) => {
     try {
-
         // Parse request parameters
         const page = parseInt(req.query.page) || 1;
         const pageSize = parseInt(req.query.pageSize) || 10;
