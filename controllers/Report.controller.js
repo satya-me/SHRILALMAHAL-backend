@@ -81,3 +81,50 @@ async function Report() {
     console.log(data);
     return data.reverse();
 }
+
+
+exports.UserReportData = async (req, res) => {
+    try {
+        // Pagination parameters
+        const page = req.query.page ? parseInt(req.query.page) : 1;
+        const limit = req.query.limit ? parseInt(req.query.limit) : 20;
+
+        const skip = (page - 1) * limit;
+
+        // Aggregation pipeline for pagination and filtering
+        const pipeline = [
+            { $match: { transitions: 1 } }, // Filter documents where transitions is equal to 1
+            { $sort: { createdAt: -1 } }, // Sort documents by createdAt field in descending order
+            { $skip: skip }, // Skip documents based on pagination
+            { $limit: limit }, // Limit the number of documents per page
+            { $project: { _id: 0, data: 1 } } // Project only the data field
+        ];
+
+        // Perform aggregation
+        const reports = await QRCodeModel.aggregate(pipeline);
+
+        // Count total documents matching the filter
+        const totalCount = await QRCodeModel.countDocuments({ transitions: 1 });
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalCount / limit);
+
+        // Response data
+        const response = {
+            success: true,
+            message: "Data fetched successfully.",
+            data: reports,
+            pagination: {
+                total: totalCount,
+                totalPages: totalPages,
+                currentPage: page,
+                pageSize: limit
+            }
+        };
+        return res.json(response);
+    } catch (error) {
+        // Handle errors
+        console.log(error.message);
+        return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
+    }
+};
