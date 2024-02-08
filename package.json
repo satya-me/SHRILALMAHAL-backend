@@ -25,6 +25,7 @@
     "express-validator": "^6.14.2",
     "fs": "^0.0.1-security",
     "http-proxy-middleware": "^2.0.6",
+    "jimp": "^0.22.10",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.22",
     "nodemailer": "^6.9.8",
@@ -33,6 +34,7 @@
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.14.0",
     "qrcode": "^1.5.3",
+    "sharp": "^0.33.2",
     "uuid": "^8.3.2",
     "worker-thread": "^1.1.0"
   }
