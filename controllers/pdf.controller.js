@@ -10,7 +10,10 @@ const nodemailer = require('nodemailer');
 
 
 exports.PDF = async (req, res) => {
+<<<<<<< HEAD
     // console.log(PDF);
+=======
+>>>>>>> 5107d71dad4eb855cbd9f16d6bdb1af854a15c92
 
     const QRModel = await QRCodeService.getAllCode(req.params.tag_name);
 
