@@ -127,14 +127,21 @@ exports.PDF = async (req, res) => {
             insertPdfRecordIfNotExists(filename);
         });
         doc.end();
+        return res.status(200).json({
+            page: `PDF generated with ${currentPage} pages.`,
+            message: msg,
+            fileName: filename,
+            file_create_status: 'PROGRESS'
+        });
     }
-    msg = "Downloading.";
+    msg = "Ready To Downloading.";
 
 
     return res.status(200).json({
         page: `PDF generated with ${currentPage} pages.`,
         message: msg,
-        fileName: filename
+        fileName: filename,
+        file_create_status: 'DONE'
     });
 
     // console.log(`PDF generated with ${currentPage} pages.`);
