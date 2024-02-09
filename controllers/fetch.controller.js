@@ -1,5 +1,6 @@
 const QRCodeModel = require('../models/QRCode');
 const TagModel = require('../models/Tag');
+const PDFModel = require('../models/PdfFiles');
 const { runBackgroundTask } = require('./BGController');
 
 exports.getQRCode = async (req, res) => {
@@ -40,6 +41,8 @@ exports.getQRCode = async (req, res) => {
         const lastRecord = _QR[_QR.length - 1];
         const recordCount = _QR.length;
         // return console.log({ TAG_DATA, _QR });
+        const isFPD = await PDFModel.findOne({ file_name: `${tag}.pdf` });
+        console.log({ isFPD });
         if (lastRecord) {
             // Calculate time difference
             const currentDate = new Date();
@@ -81,6 +84,7 @@ exports.getQRCode = async (req, res) => {
             QRS_LENGTH,
             TOTAL_QRS_LENGTH: QRS_LENGTH,
             TAG_DATA_COUNT: TAG_DATA.count,
+            isFPD: isFPD ? true : false,
             _FLAG: { is_bg: false, massage: "No need to call BG" },
         });
     } catch (error) {
