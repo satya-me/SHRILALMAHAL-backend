@@ -13,11 +13,12 @@ exports.Registration = async (req, res, next) => {
     const NewUser = new UserModel({
       full_name,
       email,
+      type,
       password: setPassword,
     });
 
     const userData = await NewUser.save();
-    const tokenData = CreateToken(userData._id);
+    const tokenData = CreateToken(userData);
     return res.status(200).json({ success: true, message: "Registered Successfully", data: userData, token: tokenData });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
@@ -37,6 +38,7 @@ exports.Login = async (req, res) => {
         id: existingUser._id,
         full_name: existingUser.full_name,
         email: existingUser.email,
+        type: existingUser.type,
         rememberme,
       };
       if (existingUser && (bcryptjs.compareSync(password, existingUser.password))) {
