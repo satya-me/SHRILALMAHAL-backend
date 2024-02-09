@@ -4,39 +4,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Star Rating Input</title>
+    <style>
+        .star-rating {
+            display: inline-flex;
+            justify-content: space-between;
+            width: 200px;
+            /* Adjust as needed */
+            font-size: 30px;
+            /* Adjust star size */
+            cursor: pointer;
+            /* Change cursor to indicate interactivity */
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            color: #ccc;
+            transition: 0.2s color;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:active,
+        .star-rating label[for]:checked~label {
+            color: #f1c40f;
+        }
+
+        .star-rating label[for]:checked {
+            color: #f1c40f;
+            /* Yellow for selected star */
+        }
+
+        .star-rating label:hover {
+            color: #f1c40f;
+            /* Highlight on hover */
+        }
+    </style>
 </head>
 
 <body>
-    <button id="askButton">Ask for location</button>
+    <div class="star-rating">
+        <input type="radio" name="rating" value="1" id="star1">
+        <label for="star1">★</label>
+        <input type="radio" name="rating" value="2" id="star2">
+        <label for="star2">★</label>
+        <input type="radio" name="rating" value="3" id="star3">
+        <label for="star3">★</label>
+        <input type="radio" name="rating" value="4" id="star4">
+        <label for="star4">★</label>
+        <input type="radio" name="rating" value="5" id="star5">
+        <label for="star5">★</label>
+    </div>
 
-    <div id="target"></div>
+    <!-- <script>
+        const starInputs = document.querySelectorAll('.star-rating input');
+
+        function updateRating(value) {
+            starInputs.forEach(starInput => {
+                starInput.checked = starInput.value <= value;
+            });
+        }
+
+        starInputs.forEach(starInput => {
+            starInput.addEventListener('change', (event) => {
+                updateRating(event.target.value);
+            });
+        });
+    </script> -->
 
     <script>
-        var target = document.getElementById('target');
-        var watchId;
+        const starInputs = document.querySelectorAll('.star-rating input');
+        let selectedValue = 0; // Initialize selected value to 0
 
-        function appendLocation(location, verb) {
-            verb = verb || 'updated';
-            var newLocation = document.createElement('p');
-            newLocation.innerHTML = 'Location ' + verb + ': ' + location.coords.latitude + ', ' + location.coords.longitude + '';
-            target.appendChild(newLocation);
+        function updateRating(value) {
+            selectedValue = value;
+            starInputs.forEach(starInput => {
+                starInput.checked = starInput.value <= selectedValue;
+            });
         }
 
-        function getLocation() {
-            if ('geolocation' in navigator) {
-                navigator.geolocation.getCurrentPosition(function (location) {
-                    appendLocation(location, 'fetched');
-                });
-                watchId = navigator.geolocation.watchPosition(appendLocation);
-            } else {
-                target.innerText = 'Geolocation API not supported.';
-            }
-        }
-
-        window.addEventListener('load', getLocation);
+        starInputs.forEach(starInput => {
+            starInput.addEventListener('click', (event) => {
+                updateRating(event.target.value);
+            });
+        });
 
     </script>
+
+
 </body>
 
 </html>

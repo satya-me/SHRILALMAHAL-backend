@@ -41,6 +41,7 @@ exports.Login = async (req, res) => {
       };
       if (existingUser && (bcryptjs.compareSync(password, existingUser.password))) {
         const tokenData = CreateToken(existingUser);
+        // console.log({existingUser});
         return res.status(200).json({ success: true, message: "Login Successfully", data: USERDATA, token: tokenData });
       } else {
         if (!(bcryptjs.compareSync(password, existingUser.password))) {

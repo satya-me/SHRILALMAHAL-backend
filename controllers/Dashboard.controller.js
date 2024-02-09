@@ -58,7 +58,7 @@ exports.DashboardData = async (req, res) => {
             USERS_WHO_WON_CASHBACK
         };
 
-        console.log(data);
+        // console.log(data);
 
         return res.json({ success: true, message: "Data fetched successfully.", data: data });
     } catch (error) {
