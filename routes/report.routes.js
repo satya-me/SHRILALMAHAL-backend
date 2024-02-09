@@ -6,7 +6,7 @@ const router = new Router();
 
 
 router.get('/data', [VerifyToken], ReportController.ReportData);
-router.get('/user/data', [VerifyToken], ReportController.UserReportData);
+router.get('/user/data', ReportController.UserReportData);
 router.get('/download-excel', [VerifyToken], ReportController.DownloadExcel);
 
 

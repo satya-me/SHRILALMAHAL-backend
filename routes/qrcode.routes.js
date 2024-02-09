@@ -12,7 +12,7 @@ const router = new Router();
 
 // ---------------------------------------------------------------------
 router.post('/create', [VerifyToken], QRCodeController.createQRCode);
-router.get('/get/:tag?', [VerifyToken], FetchController.getQRCode);
+router.get('/get/:tag?', FetchController.getQRCode);
 router.get('/tags', [VerifyToken], QRCodeController.getAllTag);
 router.get('/test', QRCodeController.test);
 router.get('/pdf/:tag_name', [VerifyToken], PDFController.PDF);

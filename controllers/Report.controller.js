@@ -89,14 +89,14 @@ exports.UserReportData = async (req, res) => {
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const limit = req.query.limit ? parseInt(req.query.limit) : 20;
 
-        const skip = (page - 1) * limit;
+        // const skip = (page - 1) * limit;
 
         // Aggregation pipeline for pagination and filtering
         const pipeline = [
             { $match: { transitions: 1 } }, // Filter documents where transitions is equal to 1
             { $sort: { createdAt: -1 } }, // Sort documents by createdAt field in descending order
-            { $skip: skip }, // Skip documents based on pagination
-            { $limit: limit }, // Limit the number of documents per page
+            // { $skip: skip }, // Skip documents based on pagination
+            // { $limit: limit }, // Limit the number of documents per page
             { $project: { _id: 0, data: 1 } } // Project only the data field
         ];
 
