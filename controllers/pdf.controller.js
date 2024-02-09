@@ -32,15 +32,22 @@ exports.PDF = async (req, res) => {
 
     let qrCodeCount = 0;
     let currentPage = 1;
-    console.log({ PdfFile });
     var msg;
     if (!PdfFile) {
         msg = "PDF generating in progress. try after sometime.";
+        res.status(200).json({
+            page: `PDF generated with ${currentPage} pages.`,
+            message: msg,
+            fileName: filename,
+            file_create_status: 'PROGRESS'
+        });
+        insertPdfRecordIfNotExists(filename, 'PROGRESS');
         for (const data of QRModel) {
             if (qrCodeCount % totalQRCodesPerPage === 0 && qrCodeCount > 0) {
                 // Create a new page if the current page is full
                 doc.addPage();
                 currentPage++;
+                console.log({ currentPage });
             }
 
             const row = Math.floor(qrCodeCount / qrCodesPerRow);
@@ -63,40 +70,40 @@ exports.PDF = async (req, res) => {
         const pdfStream = doc.pipe(fs.createWriteStream(filename));
         pdfStream.on('finish', () => {
             // Create a nodemailer transport
-            const transporter = nodemailer.createTransport({
-                host: process.env.SMTP_HOST,
-                port: process.env.SMTP_PORT,
-                secure: true,
-                // requireTLS: true,
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASSWORD,
-                },
-            });
+            // const transporter = nodemailer.createTransport({
+            //     host: process.env.SMTP_HOST,
+            //     port: process.env.SMTP_PORT,
+            //     secure: true,
+            //     // requireTLS: true,
+            //     auth: {
+            //         user: process.env.SMTP_USER,
+            //         pass: process.env.SMTP_PASSWORD,
+            //     },
+            // });
 
-            transporter.verify(function (error, success) {
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log("Server is ready to take our messages");
-                }
-            });
+            // transporter.verify(function (error, success) {
+            //     if (error) {
+            //         console.log(error);
+            //     } else {
+            //         console.log("Server is ready to take our messages");
+            //     }
+            // });
 
             console.log(path.resolve(__dirname, '..', filename));
             // Define email options
-            const mailOptions = {
-                from: process.env.SMTP_USER,
-                to: process.env.SMTP_USER_TO,
-                subject: `QR PDF of ${req.params.tag_name}`,
-                text: `PLease find the ${filename} below.`,
-                attachments: [
-                    {
-                        filename: filename,
-                        path: path.resolve(__dirname, '..', filename),
-                        encoding: 'base64', // or 'buffer' if you want to use a Buffer
-                    },
-                ],
-            };
+            // const mailOptions = {
+            //     from: process.env.SMTP_USER,
+            //     to: process.env.SMTP_USER_TO,
+            //     subject: `QR PDF of ${req.params.tag_name}`,
+            //     text: `PLease find the ${filename} below.`,
+            //     attachments: [
+            //         {
+            //             filename: filename,
+            //             path: path.resolve(__dirname, '..', filename),
+            //             encoding: 'base64', // or 'buffer' if you want to use a Buffer
+            //         },
+            //     ],
+            // };
 
             // Send the email
             // transporter.sendMail(mailOptions, (error, info) => {
@@ -124,25 +131,21 @@ exports.PDF = async (req, res) => {
             // });
             pdfStream.close();
 
-            insertPdfRecordIfNotExists(filename);
+            insertPdfRecordIfNotExists(filename, 'DONE');
         });
         doc.end();
-        return res.status(200).json({
+    } else {
+
+        msg = "Ready To Downloading.";
+
+
+        res.status(200).json({
             page: `PDF generated with ${currentPage} pages.`,
             message: msg,
             fileName: filename,
-            file_create_status: 'PROGRESS'
+            file_create_status: 'DONE'
         });
     }
-    msg = "Ready To Downloading.";
-
-
-    return res.status(200).json({
-        page: `PDF generated with ${currentPage} pages.`,
-        message: msg,
-        fileName: filename,
-        file_create_status: 'DONE'
-    });
 
     // console.log(`PDF generated with ${currentPage} pages.`);
 };
@@ -164,19 +167,24 @@ async function generateQRCode(link, size) {
 
 
 // Function to insert a record if it doesn't exist already
-async function insertPdfRecordIfNotExists(fileName) {
+async function insertPdfRecordIfNotExists(fileName, type) {
     try {
         // Check if the record already exists
         const existingRecord = await PdfFilesModel.findOne({ file_name: fileName });
+        if (existingRecord && type == 'PROGRESS') {
+            return;
+        }
 
         // If the record already exists, skip insertion
         if (existingRecord) {
+            existingRecord.status = 'DONE'; // Update the status or any other fields as needed
+            await existingRecord.save();
             console.log('Record already exists. Skipping insertion.');
             return;
         }
 
         // If the record doesn't exist, insert it
-        const newRecord = new PdfFilesModel({ file_name: fileName });
+        const newRecord = new PdfFilesModel({ file_name: fileName , status: 'PENDING'});
         await newRecord.save();
         console.log('Record inserted successfully.');
     } catch (error) {

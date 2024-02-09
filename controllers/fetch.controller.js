@@ -70,21 +70,27 @@ exports.getQRCode = async (req, res) => {
                 });
             }
         }
-        console.log({
-            // QRS,
-            QRS_LENGTH,
-            TOTAL_QRS_LENGTH: QRS_LENGTH,
-            TAG_DATA_COUNT: TAG_DATA.count,
-            _FLAG: { is_bg: false, massage: "No need to call BG" },
-        });
+
         // runBackgroundTask(tag, TAG_DATA.count, TAG_DATA.count);
         // Return response with appropriate flag
+        var isPDFStatus = '';
+        if (!isPDF) {
+            isPDFStatus = 'XXX';
+        }
+        else if (isPDF.status == 'DONE') {
+            isPDFStatus = 'DONE';
+        }
+        else if (isPDF.status == 'PENDING') {
+            isPDFStatus = 'PENDING';
+        }
+
+        console.log(isPDFStatus);
         return res.send({
             QRS,
             QRS_LENGTH,
             TOTAL_QRS_LENGTH: QRS_LENGTH,
             TAG_DATA_COUNT: TAG_DATA.count,
-            isPDF: isPDF ? true : false,
+            isPDF: isPDFStatus,
             _FLAG: { is_bg: false, massage: "No need to call BG" },
         });
     } catch (error) {
